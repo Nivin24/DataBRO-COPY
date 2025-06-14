@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Settings</title>
+  <style>
+    /* Root Variables and Theme (same as profile page) */
+    :root {
+      --bg-color: #f9f9f9;
+      --text-color: #000;
+      --card-bg-color: #fff;
+      --card-border-color: #ddd;
+      --card-shadow-color: rgba(0, 0, 0, 0.1);
+      --gradient-hover: linear-gradient(145deg, #d6eaff, #ffffff);
+      --icon-bg-color: #0051ffd8;
+      --icon-box-color: #2041e7;
+      --icon-color: #fff;
+      --icon-hover-bg-color: #0056b3;
+    }
+    [data-theme="dark"] {
+      --bg-color: #100a1b;
+      --text-color: #fff;
+      --card-bg-color: #271b43;
+      --card-border-color: #2c1d50;
+      --card-shadow-color: rgba(0, 0, 0, 0.5);
+      --gradient-hover: linear-gradient(145deg, #271b43, #200e49);
+      --icon-bg-color: #4e23c3;
+      --icon-box-color: rgba(44, 16, 95, 0.9);
+      --icon-hover-bg-color: #5f41af;
+    }
+
+    body, h1, h2, p, label {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+    nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--icon-bg-color);
+        color: var(--icon-color);
+        padding: 1rem 2rem;
+    }
+    nav .logo h2 {
+        margin: 0;
+    }
+    nav .nav-links a {
+        color: var(--icon-color);
+        text-decoration: none;
+        margin-left: 1.5rem;
+        font-weight: bold;
+        transition: transform 0.2s ease;
+    }
+    #home {
+        color: var(--icon-color);
+        text-decoration: none;
+        font-weight: bold;
+        transition: transform 0.2s ease;
+    }
+    #home:hover{
+        transform: scale(1.05);
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: var(--card-bg-color);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px var(--card-shadow-color);
+      border: 1px solid var(--card-border-color);
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--card-border-color);
+      border-radius: 4px;
+      background-color: #fff;
+      color: #000;
+    }
+    .btn {
+      padding: 0.5rem 1.5rem;
+      background-color: var(--icon-bg-color);
+      color: var(--icon-color);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn:hover {
+      background-color: var(--icon-hover-bg-color);
+    }
+    .theme-toggle-btn {
+        background: var(--icon-box-color);
+        color: var(--icon-color);
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+        margin-left: 1rem;
+        font-size: 1.2rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+    .theme-toggle-btn:hover {
+        background: var(--icon-hover-bg-color);
+    }
+    @media (max-width: 768px) {
+      nav {
+        flex-direction: column;
+        text-align: center;
+      }
+      nav .nav-links {
+        margin-top: 1rem;
+        /* top: 20px; */
+      }
+    }
+  </style>
+</head>
+<body>
+    <nav style="display: flex;">
+        <div class="logo">
+            <a href="{{ url_for('home.home') }}" style="text-decoration: none;">
+                <img src="{{ url_for('static', filename='databro.png') }}" alt="DataBRO Logo" style="height:40px; border-radius: 30%; vertical-align:middle; margin-right:10px;">
+                <h2 style="display:inline; vertical-align:middle; color: #fff;">DataBRO</h2>
+            </a>
+        </div>
+        <div class="nav-links" style="display: flex; align-items: center; gap: 1rem;">
+            <a id="home" href="{{ url_for('home.home') }}" style="transition: transform 0.2s;" title="Home">
+            <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="#FFFFFF"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/></svg>
+            </a>
+            <a id="home" href="{{ url_for('profile.profile') }}" style="transition: transform 0.2s;" title="Settings">
+            <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="#FFFFFF"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
+            </a>
+            <form action="{{ url_for('login.logout') }}" method="post" style="display: inline; margin-left: 20px;" title="Logout">
+            <button id="home" type="submit" style="background: none; border: none; color: #fff; text-decoration: none; cursor: pointer; font-weight: bold;">
+                <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="#FFFFFF"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
+            </button>
+            </form>
+            <button class="theme-toggle-btn" id="theme-toggle" title="Toggle theme">&#9788;</button>
+        </div>
+    </nav>
+
+  <div class="container">
+    <h1>Account Settings</h1>
+    <form>
+      <div class="form-group">
+        <label for="username">Display Name</label>
+        <input type="text" id="username" placeholder="Enter your display name" />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="you@example.com" />
+      </div>
+
+      <div class="form-group">
+        <label for="theme">Preferred Theme</label>
+        <select id="theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="password">New Password</label>
+        <input type="password" id="password" placeholder="••••••••" />
+      </div>
+
+      <button type="submit" class="btn">Save Changes</button>
+    </form>
+  </div>
+
+  <script>
+    // Theme persistence and toggle
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            document.getElementById('theme-toggle').innerHTML = theme === 'dark' ? '&#9790;' : '&#9788;';
+        }
+        // On load, set theme from localStorage or default
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
+        })();
+        // Toggle button
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+  </script>
+</body>
+</html>

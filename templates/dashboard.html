@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DataBRO Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    :root {
+        --bg-gradient: linear-gradient(135deg, #f9f9f9 0%, #c3e0f5 100%);
+        --logo-title-color: #14213d;
+        --card-border-color: #ddd;
+        --background-color:wheat;
+        --text-color: #000;
+        --toogle-color: #071019;
+        --card-bg-color: #fff;
+        --card-border-color: #ddd;
+        --card-shadow-color: rgba(0, 0, 0, 0.1);
+        /* Dashboard */
+        --dash-gradient: linear-gradient(135deg, #f9f9f9 0%, #c3e0f5 100%);
+        --button-bg: #eae7e7ec;
+        --button-text: #333;
+        --button-border: #ccc;
+        --button-hover: #c3e0f5;
+    }
+    [data-theme="dark"] {
+        --bg-gradient: linear-gradient(135deg, #100a1b, #271b43);
+        --logo-title-color: #fff;
+        --card-border-color: #2c1d50;
+        --background-color:rgba(21, 26, 80, 0.769);
+        --text-color: #fff;
+        --toogle-color: #071019;
+        --card-bg-color: #271b43;
+        --card-border-color: #2c1d50;
+        --card-shadow-color: rgba(0, 0, 0, 0.5);
+        /* Dashboard */
+        --dash--gradient: linear-gradient(135deg, #493371ed, #271b43);
+        --button-bg: #271b43d8;
+        --button-text: #fff;
+        --button-border: #2c1d50;
+        --button-hover: #493371ed;
+
+    }
+    body { 
+      background-color: var(--bg-color);
+      background-image: var(--bg-gradient, none);
+      overflow-x:hidden;
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease; 
+      font-family: Arial, Helvetica, sans-serif; 
+    }
+    .card { 
+      border: none; border-radius: 0.5rem; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    }
+    .chart-box { 
+      background: white; padding: 20px; 
+      margin-bottom: 20px; border-radius: 0.5rem; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+    }
+    .metric-number { 
+      font-size: 3.5em; 
+      font-weight: bold; 
+    }
+    .metric-title{
+      font-weight: 600;
+    }
+
+    .chart-title { 
+      font-weight: 600; 
+      /* margin-bottom: 10px; */
+    }
+    svg { 
+      width: 100% !important; 
+      height: 300px !important; 
+    }
+    .databro-title {
+        font-weight: bold;
+        font-size: 1.5em;
+        color: var(--logo-title-color, #14213d);
+        transition: color 0.3s;
+    }
+    
+    .tooltip {
+      position: absolute;
+      background-color: rgba(0,0,0,0.75);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    
+    /* For Navigation */
+    .profile-menu-container {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        cursor: pointer;
+        z-index: 1100;
+    }
+
+    .profile-picture {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 2px solid var(--card-border-color);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .profile-dropdown {
+        display: none;
+        position: absolute;
+        right: 0;
+        margin-top: 10px;
+        background-color: var(--background-color, #fff);
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
+        width: 150px;
+        z-index: 1200;
+    }
+
+    .profile-dropdown a,
+    .profile-dropdown .logout-button {
+        display: block;
+        padding: 10px 20px;
+        color: var(--text-color, #333);
+        text-decoration: none;
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+        font-size: 0.95rem;
+    }
+
+    .profile-dropdown a:hover,
+    .profile-dropdown .logout-button:hover {
+        background-color: transparent;
+        transform: scale(1.05);
+        cursor: pointer;
+
+    }
+
+    nav .auth-buttons {
+        position: absolute;
+        top: 20px;
+        right: 90px;
+        z-index: 1100;
+    }
+    #nav{
+              
+        width: 100vw;
+        height: 80px;
+        border: 1px  rgba(112, 12, 183, 0.3);
+        box-shadow: 0 4px 6px rgba(0, 0, 0.1, 0);
+    }
+    .user-controls {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        z-index: 1100;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .user-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 2px solid var(--card-border-color);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .logout-form {
+        display: inline;
+    }
+
+    .invert-icon {
+        filter: invert(1);
+    }
+
+    .logo h2 {
+        margin: 0;
+    }
+    .theme-toggle {
+        position: fixed;
+        width: 48px;
+        height: 47px;
+        top: 20px;
+        right: 80px;
+        z-index: 1200;
+        /* padding: 12px 12px; */
+        font-size: 1.2rem;
+        background-color: var(--card-bg-color);
+        border: 1px solid var(--card-border-color);
+        border-radius: 50%;
+        box-shadow: 0 2px 6px var(--card-shadow-color);
+        cursor: pointer;
+        color: var(--text-color);
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+    .theme-toggle:hover {
+        background: var(--card-bg-color);
+        box-shadow: 0 4px 8px var(--card-shadow-color);
+    }
+    /* End of Nav styles */
+
+
+    /* Dashboard content css */
+    .dashTheme{
+      background-image: var(--dash--gradient);
+      color: var(--text-color);
+    }
+    .dashTheme table {
+      background-color: transparent !important;
+      color: inherit !important;
+    }
+
+    .dashTheme table td,
+    .dashTheme table th {
+      background-color: transparent !important;
+      max-width: 30vw;
+      color: inherit !important;
+      border-color: #44444444 !important;
+    }
+
+    .dashTheme .table-striped > tbody > tr:nth-of-type(odd) {
+      background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+    .theme-button {
+      background-color: var(--button-bg);
+      box-shadow: #000;
+      color: var(--button-text);
+      /* border: 1px solid var(--button-border); */
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .theme-button:hover {
+      background-color: var(--button-hover);
+      box-shadow: var(--button-border);
+    }
+  </style>
+</head>
+<body class="container-fluid p-0">
+  <!-- GOOGLE auth  -->
+  <nav id="nav">
+      <div class="user-controls">
+          {% if user %}
+              <div class="profile-menu-container" style="position: fixed; top: 20px; right: 20px;">
+                  <img src="{{ user.picture }}" alt="User Picture" class="profile-picture">
+                  <div id="profileDropdown" class="profile-dropdown" style="background-color: var(--card-bg-color); color: var(--text-color); border-color: var(--card-border-color); display: none;">
+                      <a href="{{ url_for('profile.profile') }}" style="color: var(--text-color); transition: transform 0.3s ease;">
+                          Profile
+                      </a>
+                      <a href="{{ url_for('settings.settings') }}" style="color: var(--text-color); transition: transform 0.3s ease;">
+                          Settings
+                      </a>
+                      <form action="{{ url_for('login.logout') }}" method="post" style="margin: 0;">
+                          <button type="submit" class="logout-button" style="color: var(--text-color); border: none; transition: transform 0.3s ease;">
+                              Logout
+                          </button>
+                      </form>
+                  </div>
+              </div>
+              <script>
+                  const profileMenuContainer = document.querySelector('.profile-menu-container');
+                  const profileDropdown = document.getElementById('profileDropdown');
+                  let hideTimeout;
+
+                  // Show dropdown on mouseenter
+                  profileMenuContainer.addEventListener('mouseenter', () => {
+                      clearTimeout(hideTimeout);
+                      profileDropdown.style.display = 'block';
+                  });
+
+                  // Hide dropdown on mouseleave (with delay)
+                  profileMenuContainer.addEventListener('mouseleave', () => {
+                      hideTimeout = setTimeout(() => {
+                          profileDropdown.style.display = 'none';
+                      }, 300);
+                  });
+
+                  profileDropdown.addEventListener('mouseenter', () => {
+                      clearTimeout(hideTimeout);
+                  });
+
+                  profileDropdown.addEventListener('mouseleave', () => {
+                      hideTimeout = setTimeout(() => {
+                          profileDropdown.style.display = 'none';
+                      }, 300);
+                  });
+
+                  // Toggle dropdown on click
+                  profileMenuContainer.addEventListener('click', (e) => {
+                      // Prevent click from propagating to window (which may close the menu)
+                      e.stopPropagation();
+                      if (profileDropdown.style.display === 'block') {
+                          profileDropdown.style.display = 'none';
+                      } else {
+                          profileDropdown.style.display = 'block';
+                      }
+                  });
+
+                  // Optional: Hide dropdown when clicking outside
+                  window.addEventListener('click', function (e) {
+                      if (!profileMenuContainer.contains(e.target)) {
+                          profileDropdown.style.display = 'none';
+                      }
+                  });
+              </script>
+          {% else %}
+              <a id="sign_in" href="{{ url_for('login') }}">
+                  <button>
+                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                      <span id="desktop-only">Sign in</span>
+                  </button>
+              </a>
+          {% endif %}
+      </div>
+      <!-- sign-in sign out end -->
+      <!--  -->
+      <div class="logo" style="position: fixed; top: 20px; left: 20px; z-index: 1200; display: flex; align-items: center;">
+          <a href="{{ url_for('home.home') }}" style="text-decoration: none; display: flex; align-items: center;">
+              <img src="{{ url_for('static', filename='databro.png') }}" alt="DataBRO Logo" style="height:40px; border-radius: 30%; vertical-align:middle; margin-right:10px;">
+              <h2 class="databro-title" style="display:inline; vertical-align:middle; margin: 0;">DataBRO</h2>
+          </a>
+      </div>
+    <button aria-label="Toggle theme" class="theme-toggle" onclick="toggleTheme()" id="themeToggleButton">☾</button>
+  </nav>
+
+  <div class="container py-4">
+  <h2 style="font-weight: bolder;" class="text-center mb-4">DataBRO Admin Dashboard</h2>
+
+  <!-- Metrics Row -->
+  <div class="row g-4 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card p-3 text-center dashTheme">
+        <div class="metric-title">Total Users</div>
+        <div id="totalUsers" class="metric-number">0</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card p-3 text-center dashTheme">
+        <div class="metric-title">Today's Active Users</div>
+        <div id="todaysActiveUsers" class="metric-number">0</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card p-3 text-center dashTheme">
+        <div class="metric-title">New Signups (7 Days)</div>
+        <div id="signups7" class="metric-number">0</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card p-3 text-center dashTheme">
+        <div class="metric-title">New Signups (30 Days)</div>
+        <div id="signups30" class="metric-number">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Row 1 -->
+  <div class="row">
+    <div class="col-12 col-lg-6 mb-4">
+      <div class="card chart-box h-100 dashTheme">
+        <!-- <div class="card-header">
+          <h5 class="mb-0 chart-title">Daily Active Users (Last 30 Days)</h5>
+        </div>
+        <div class="card-body">
+          <div id="dauChart"></div>
+        </div> -->
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 chart-title" id="dauChartTitle">Daily Active Users (Last 7 Days)</h5>
+          <button id="toggleDauView" class="btn theme-button btn-sm">Switch to 30 Days</button>
+        </div>
+        <div class="card-body">
+          <div id="dauChart"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6 mb-4">
+      <div class="card chart-box h-100 dashTheme">
+        <div class="card-header">
+          <h5 class="mb-0 chart-title">Most Active Weekdays</h5>
+        </div>
+        <div class="card-body">
+          <div id="dauAreaChart"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Row 2 -->
+   <!-- Top 10 Users -->
+  <div class="row">
+    <div class="col-12 col-lg-6 mb-4">
+      <div class="card chart-box h-100 dashTheme">
+        <div class="card-header">
+          <h5 class="mb-0 chart-title">Top 10 Most Active Users</h5>
+        </div>
+        <div class="card-body">
+          <div id="topUsersChart"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Pie Chart -->
+    <div class="col-12 col-lg-6 mb-4">
+      <div class="card chart-box h-100 dashTheme">
+        <div class="card-header">
+          <h5 class="mb-0 chart-title">Badges Distribution</h5>
+        </div>
+        <button id="toggleBadgeTest" class="btn btn-secondary mt-2">
+          Toggle Test Badge Pie
+        </button>
+        <div class="card-body">
+          <div id="badgePie"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="card chart-box mb-4 dashTheme">
+    <div class="card-header">
+      <h5 class="mb-0 chart-title">Recent Signup Activity</h5>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped">
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Last Active</th></tr>
+        </thead>
+        <tbody id="activityTable">
+          <tr><td colspan="3">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Tooltip -->
+<div id="tooltip" class="tooltip"></div>
+
+  <script>
+
+    async function fetchDashboardData() {
+      try {
+        const response = await fetch('/api/dashboard-data');
+        const data = await response.json();
+        updateDashboard(data);
+      } catch (error) {
+        console.error('API fetch failed, using dummy data:', error);
+        updateDashboard(dummyStats); // Use fallback data
+      }
+    }
+
+    let isShowing7Days = true;
+    // Updating The Dashboard
+    function updateDashboard(data) {
+      // Update number cards
+      document.getElementById('totalUsers').textContent = data.total_users;
+      document.getElementById('signups7').textContent = data.new_signups_7;
+      document.getElementById('signups30').textContent = data.new_signups_30;
+
+      // Update Today's Active Users
+      const today = new Date().toISOString().slice(0, 10);
+      const todayData = data.dau_trend.find(d => d.date === today);
+      document.getElementById('todaysActiveUsers').textContent = todayData ? todayData.count : 0;
+
+      // Table
+      const tableBody = document.getElementById('activityTable');
+      tableBody.innerHTML = '';
+      data.recent_users.forEach(user => {
+        const row = `<tr><td>${user.name}</td><td>${user.email}</td><td>${user.last_login}</td></tr>`;
+        tableBody.innerHTML += row;
+      });
+
+      // DAU toggle logic
+      const daysToShow = isShowing7Days ? 7 : 30;
+      const slicedData = data.dau_trend.slice(-daysToShow);
+      drawDauChart(slicedData);
+      // Update chart title
+      document.getElementById('dauChartTitle').textContent =
+        `Daily Active Users (Last ${daysToShow} Days)`;
+
+      // Charts
+      // drawDauChart(data.dau_trend);
+      drawTopUsersChart(data.top_users);
+      drawDauAreaChart(data.dau_trend);
+
+      // Badge Pie
+      if (Object.keys(data.badges).length === 0) {
+        document.getElementById('toggleBadgeTest').style.display = 'inline-block';
+      } else {
+        drawBadgePie(data.badges);
+        document.getElementById('toggleBadgeTest').style.display = 'none';
+      }
+    }
+
+    // For Testing if the badge Length is 0
+    let isTestBadgeVisible = false;
+
+    document.getElementById('toggleBadgeTest').addEventListener('click', () => {
+      const pieContainer = document.getElementById('badgePie');
+      const btn = document.getElementById('toggleBadgeTest');
+
+      if (!isTestBadgeVisible) {
+        // Show dummy/test data
+        drawBadgePie({ Beginner: 10, Intermediate: 5, Pro: 3, Guru: 1 });
+        btn.textContent = 'Hide Test Badge Pie';
+      } else {
+        // Clear chart
+        pieContainer.innerHTML = '';
+        btn.textContent = 'Show Test Badge Pie';
+      }
+
+      isTestBadgeVisible = !isTestBadgeVisible;
+    });
+    // 
+    // For Bar Chart---------------------------
+
+    function drawDauChart(dauData) {
+      d3.select('#dauChart').html('');
+
+      const container = document.getElementById('dauChart');
+      const svgWidth = container.getBoundingClientRect().width;
+      const svgHeight = 300;
+      const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+      const width = svgWidth - margin.left - margin.right;
+      const height = svgHeight - margin.top - margin.bottom;
+
+      const svg = d3.select("#dauChart")
+        .append("svg")
+        .attr("width", svgWidth)
+        .attr("height", svgHeight);
+
+      const g = svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      const x = d3.scaleBand()
+        .domain(dauData.map(d => d.date))
+        .range([0, width])
+        .padding(0.1);
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(dauData, d => d.count)])
+        .nice()
+        .range([height, 0]);
+
+      g.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x).tickValues(x.domain().filter((d, i) => i % 5 === 0)));
+
+      g.append("g")
+        .call(d3.axisLeft(y).ticks(d3.max(dauData, d => d.count)).tickFormat(d => Number.isInteger(d) ? d : ''));
+
+      const tooltip = d3.select("#tooltip");
+
+      const bars = g.selectAll(".bar")
+        .data(dauData)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", d => x(d.date))
+        .attr("y", y(0)) // Start from bottom
+        .attr("width", x.bandwidth())
+        .attr("height", 0) // No height initially
+        .attr("fill", "#007bff")
+        .on("mouseover", function (event, d) {
+          d3.select(this).transition().duration(100).attr("fill", "#0056b3");
+          tooltip.style("opacity", 1)
+            .html(`<strong>Date:</strong> ${d.date}<br/><strong>Count:</strong> ${d.count}`)
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mousemove", event => {
+          tooltip.style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function () {
+          d3.select(this).transition().duration(100).attr("fill", "#007bff");
+          tooltip.style("opacity", 0);
+        });
+
+      // Animate bars growing
+      bars.transition()
+        .duration(800)
+        .attr("y", d => y(d.count))
+        .attr("height", d => height - y(d.count));
+
+      // Bar labels
+      g.selectAll(".label")
+        .data(dauData)
+        .enter().append("text")
+        .attr("x", d => x(d.date) + x.bandwidth() / 2)
+        .attr("y", d => y(d.count) - 5)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "10px")
+        .attr("fill", "var(--text-color)")
+        .text(d => d.count);
+    }
+    document.getElementById('toggleDauView').addEventListener('click', () => {
+        isShowing7Days = !isShowing7Days;
+        const label = isShowing7Days ? 'Switch to 30 Days' : 'Switch to 7 Days';
+        document.getElementById('toggleDauView').textContent = label;
+        fetchDashboardData(); // this should now use updated isShowing7Days
+      });
+
+// Area Chart ----------------------------
+    function drawDauAreaChart(dauData) {
+      d3.select('#dauAreaChart').html('');
+
+      const container = document.getElementById('dauAreaChart');
+      const svgWidth = container.getBoundingClientRect().width;
+      const svgHeight = 300;
+      const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+      const width = svgWidth - margin.left - margin.right;
+      const height = svgHeight - margin.top - margin.bottom;
+
+      const svg = d3.select('#dauAreaChart')
+        .append('svg')
+        .attr('width', svgWidth)
+        .attr('height', svgHeight);
+
+      const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+      // Convert date string to Date object and map weekdays
+      const parseDate = d3.timeParse('%Y-%m-%d');
+      const weekdayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const weekdayData = {};
+
+      dauData.forEach(d => {
+        const dateObj = parseDate(d.date);
+        const weekday = weekdayMap[dateObj.getDay()];
+        weekdayData[weekday] = (weekdayData[weekday] || 0) + d.count;
+      });
+
+      const orderedWeekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      const finalData = orderedWeekdays.map(day => ({ weekday: day, count: weekdayData[day] || 0 }));
+
+      const x = d3.scalePoint().domain(orderedWeekdays).range([0, width]);
+      const y = d3.scaleLinear().domain([0, d3.max(finalData, d => d.count)]).nice().range([height, 0]);
+
+      const area = d3.area()
+        .x(d => x(d.weekday))
+        .y0(height)
+        .y1(d => y(d.count))
+        .curve(d3.curveMonotoneX);
+
+      const line = d3.line()
+        .x(d => x(d.weekday))
+        .y(d => y(d.count))
+        .curve(d3.curveMonotoneX);
+
+      g.append('g')
+        .attr('transform', `translate(0,${height})`)
+        .call(d3.axisBottom(x));
+
+      g.append('g')
+        .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('d')));
+
+      // AREA path animation
+      const areaPath = g.append('path')
+        .datum(finalData)
+        .attr('fill', '#007bff')
+        .attr('opacity', 0.3)
+        .attr('d', area);
+
+      const totalLengthArea = areaPath.node().getTotalLength();
+
+      areaPath
+        .attr("stroke-dasharray", `${totalLengthArea} ${totalLengthArea}`)
+        .attr("stroke-dashoffset", totalLengthArea)
+        .transition()
+        .duration(1000)
+        .attr("stroke-dashoffset", 0);
+
+      // LINE path animation
+      const linePath = g.append('path')
+        .datum(finalData)
+        .attr('fill', 'none')
+        .attr('stroke', '#007bff')
+        .attr('stroke-width', 2)
+        .attr('d', line);
+
+      const totalLengthLine = linePath.node().getTotalLength();
+
+      linePath
+        .attr("stroke-dasharray", `${totalLengthLine} ${totalLengthLine}`)
+        .attr("stroke-dashoffset", totalLengthLine)
+        .transition()
+        .duration(1000)
+        .attr("stroke-dashoffset", 0);
+
+      const tooltip = d3.select('#tooltip');
+      // Labels on the Weekday count
+      g.selectAll(".label")
+        .data(finalData)
+        .enter().append("text")
+        .attr('x', d => x(d.weekday))
+        .attr('y', d => y(d.count)-10)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "10px")
+        .attr("fill", "var(--text-color)")
+        .text(d => d.count);
+
+      g.selectAll('circle')
+        .data(finalData)
+        .enter()
+        .append('circle')
+        .attr('cx', d => x(d.weekday))
+        .attr('cy', d => y(d.count))
+        .attr('r', 4)
+        .attr('fill', '#0056b3')
+        .style('stroke','white')
+        .on('mouseover', (event, d) => {
+          tooltip.transition().duration(200).style('opacity', 0.9);
+          tooltip.html(`<strong>${d.weekday}</strong><br/><strong>Count:</strong> ${d.count}`)
+            .style('left', (event.pageX + 10) + 'px')
+            .style('top', (event.pageY - 28) + 'px');
+        })
+        .on('mousemove', (event) => {
+          tooltip.style('left', (event.pageX + 10) + 'px')
+            .style('top', (event.pageY - 28) + 'px');
+        })
+        .on('mouseout', () => {
+          tooltip.transition().duration(500).style('opacity', 0);
+        });
+    }
+// Horizontal Bar Chart---------------------------
+    function drawTopUsersChart(users) {
+      d3.select('#topUsersChart').html('');
+      const container = document.getElementById('topUsersChart');
+      const svgWidth = container.getBoundingClientRect().width;
+      const svgHeight = 300;
+      const margin = { top: 20, left: 100, right: 30, bottom: 20 };
+      const width = svgWidth - margin.left - margin.right;
+      const height = svgHeight - margin.top - margin.bottom;
+
+      const svg = d3.select('#topUsersChart').append('svg')
+        .attr('width', svgWidth)
+        .attr('height', svgHeight);
+
+      const g = svg.append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+
+      const x = d3.scaleLinear().domain([0, d3.max(users, d => d.count)]).range([0, width]);
+      const y = d3.scaleBand().domain(users.map(d => d.name)).range([0, height]).padding(0.1);
+
+      const tooltip = d3.select('#tooltip');
+
+      // Bars with animation
+      const bars = g.selectAll(".bar")
+        .data(users)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", 0)
+        .attr("y", d => y(d.name))
+        .attr("width", 0) // Start from 0 width
+        .attr("height", y.bandwidth())
+        .attr("fill", "#007bff")
+        .on("mouseover", function(event, d) {
+          d3.select(this).transition().duration(100).attr("fill", "#0056b3");
+          tooltip.transition().duration(200).style("opacity", 0.9);
+          tooltip.html(`<strong>${d.name}</strong><br/>Activities: ${d.count}<br/>Last Active: ${d.last_login || 'N/A'}`)
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mousemove", function(event) {
+          tooltip.style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function() {
+          d3.select(this).transition().duration(100).attr("fill", "#007bff");
+          tooltip.transition().duration(500).style("opacity", 0);
+        });
+
+      // Animate bars growing
+      bars.transition()
+        .duration(800)
+        .attr("width", d => x(d.count));
+
+      // User name labels (left)
+      svg.selectAll(".label")
+        .data(users)
+        .enter().append("text")
+        .attr("x", margin.left - 5)
+        .attr("y", d => margin.top + y(d.name) + y.bandwidth() / 2)
+        .attr("dy", ".35em")
+        .attr("text-anchor", "end")
+        .attr("fill", "var(--text-color)")
+        .text(d => d.name);
+
+      // Count labels (right of bars) — animated fade-in
+      g.selectAll(".count-label")
+        .data(users)
+        .enter().append("text")
+        .attr("x", 5)
+        .attr("y", d => y(d.name) + y.bandwidth() / 2)
+        .attr("dy", ".35em")
+        .attr("text-anchor", "start")
+        .attr("font-size", "11px")
+        .attr("fill", "var(--text-color)")
+        .style("opacity", 0)
+        .text(d => d.count)
+        .transition()
+        .delay(500)
+        .duration(500)
+        .attr("x", d => x(d.count) + 5)
+        .style("opacity", 1);
+    }
+// Pie Chart---------------------------
+    function drawBadgePie(badgeData) {
+      d3.select('#badgePie').html('');
+      const container = document.getElementById('badgePie');
+      const svgWidth = container.getBoundingClientRect().width;
+      const svgHeight = 300;
+      const svg = d3.select('#badgePie').append('svg').attr('width', svgWidth).attr('height', svgHeight);
+      const g = svg.append("g").attr("transform", `translate(${svgWidth / 2}, ${svgHeight / 2})`);
+
+      const pie = d3.pie().value(d => d[1]);
+      const dataReady = pie(Object.entries(badgeData));
+      const arc = d3.arc().innerRadius(0).outerRadius(Math.min(svgWidth, svgHeight) / 2 - 20);
+      // const accessibleColors = [
+      //   "#4E79A7", // Muted blue  Default or safe base
+      //   "#F28E2B", // Orange    Highlights or badges
+      //   "#E15759", // Coral red   Warnings or alerts
+      //   "#76B7B2", // Teal    Badges or charts
+      //   "#59A14F", // Green    Success metrics
+      //   "#EDC948", // Mustard yellow   Caution / attention
+      //   "#B07AA1", // Purple   On-brand element
+      //   "#FF9DA7"  // Soft pink (optional contrast)  Optional alt highlight
+      // ];
+
+      // const color = d3.scaleOrdinal(accessibleColors);
+
+      const pieChartColors = [
+        "#8dd3c7", // teal
+        "#ffffb3", // yellow
+        "#bebada", // lavender
+        "#fb8072", // soft red
+        "#80b1d3", // light blue
+        "#fdb462", // orange
+        "#b3de69", // green
+        "#fccde5"  // pink
+      ];
+
+      const color = d3.scaleOrdinal(pieChartColors);
+
+      g.selectAll('path')
+        .data(dataReady)
+        .join('path')
+        .attr('d', arc)
+        .attr('fill', d => color(d.data[0]))
+        .attr("stroke", "white");
+
+      g.selectAll('text')
+        .data(dataReady)
+        .join('text')
+        .text(d => d.data[0])
+        .attr("transform", d => `translate(${arc.centroid(d)})`)
+        .style("text-anchor", "middle");
+    }
+
+    // Start fetching data
+    fetchDashboardData();
+    // Redraw charts on window resize
+    window.addEventListener('resize', () => {
+      fetchDashboardData(); // re-fetch and re-render with new widths
+    });
+  </script>
+  <!-- Theme Toggle Functions -->
+  <script>
+    function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+
+            // Update the button icon
+            const themeToggleButton = document.getElementById('themeToggleButton');
+            themeToggleButton.textContent = newTheme === 'dark' ? '☾' : '☼';
+        }
+
+        // Load the saved theme from localStorage
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // Set the initial button icon
+        const themeToggleButton = document.getElementById('themeToggleButton');
+        themeToggleButton.textContent = savedTheme === 'dark' ? '☾' : '☼';
+  </script>
+</body>
+</html>

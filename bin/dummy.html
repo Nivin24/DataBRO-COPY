@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>window.open Demo</title>
+</head>
+<body>
+    <h2>window.open() Demo</h2>
+
+    <!-- _blank: Opens in new tab -->
+    <button onclick="window.open('https://www.youtube.com/watch?v=_uQrJ0TkZlc', '_blank')">
+        Open in New Tab (_blank)
+    </button><br><br>
+
+    <!-- _self: Opens in same tab -->
+    <button onclick="window.open('https://www.youtube.com/watch?v=_uQrJ0TkZlc', '_self')">
+        Open in Same Tab (_self)
+    </button><br><br>
+
+    <!-- _top: Break out of iframe -->
+    <button onclick="window.open('https://www.youtube.com/watch?v=_uQrJ0TkZlc', '_top')">
+        Open in Top Window (_top)
+    </button><br><br>
+
+    <!-- Named popup window -->
+    <button onclick="openPopup()">
+        Open in Custom Popup Window
+    </button>
+
+    <div style="width: 100vw; height: 100vh; background-color: lightblue; display: flex; justify-content: center; align-items: center; font-size: 24px;">
+        <div style="animation: fadeInOut 3s infinite;">
+            Custom Popup Window
+        </div>
+        <style>
+            @keyframes fadeInOut {
+            0%, 100% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            }
+        </style>
+    </div>
+
+    <script>
+        function openPopup() {
+            window.open(
+                'https://www.youtube.com/watch?v=_uQrJ0TkZlc',
+                'myPopupWindow',
+                'width=800,height=600,resizable=yes,scrollbars=yes'
+            );
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz App</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+
+    .progress-bar {
+      height: 10px;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0;
+      background-color: #4caf50;
+      transition: width 0.3s ease;
+    }
+
+    #question-number {
+      text-align: center;
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div id="quiz">
+      <h2 id="page-heading">Simple Quiz App</h2>
+
+      <!-- Start Button -->
+      <button id="start-btn" class="btn">Start Quiz</button>
+
+      <!-- Question Number -->
+      <div id="question-number" class="hide">Question 1 of 10</div>
+
+      <!-- Progress Bar -->
+      <div class="progress-bar hide">
+        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+      </div>
+
+      <!-- Question Container -->
+      <div id="question-container" class="hide">
+        <div id="question" class="question"></div>
+        <div id="answer-buttons" class="btn-container"></div>
+      </div>
+
+      <!-- Timer -->
+      <div id="timer" class="timer hide"></div>
+
+      <!-- Result -->
+      <div id="result-container" class="hide"></div>
+
+      <!-- Score (if needed separately) -->
+      <div id="score-container"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

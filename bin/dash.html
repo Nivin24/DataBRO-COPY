@@ -1,0 +1,35 @@
+<script>
+    function updateDashboard(data) {
+  // Metrics
+  document.getElementById('totalUsers').textContent = data.total_users;
+  document.getElementById('signups7').textContent = data.new_signups_7;
+  document.getElementById('signups30').textContent = data.new_signups_30;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const todayData = data.dau_trend.find(d => d.date === today);
+  document.getElementById('todaysActiveUsers').textContent = todayData ? todayData.count : 0;
+
+  // Table
+  const tableBody = document.getElementById('activityTable');
+  tableBody.innerHTML = '';
+  data.recent_users.forEach(user => {
+    tableBody.innerHTML += `<tr><td>${user.name}</td><td>${user.email}</td><td>${user.last_login}</td></tr>`;
+  });
+
+  // ⬇️ Use this for chart toggle logic
+  const daysToShow = isShowing7Days ? 7 : 30;
+  const slicedData = data.dau_trend.slice(-daysToShow);
+  drawDauChart(slicedData);
+
+  // Keep other charts using full data
+  drawDauAreaChart(data.dau_trend);
+  drawTopUsersChart(data.top_users);
+
+  if (Object.keys(data.badges).length === 0) {
+    document.getElementById('toggleBadgeTest').style.display = 'inline-block';
+  } else {
+    drawBadgePie(data.badges);
+    document.getElementById('toggleBadgeTest').style.display = 'none';
+  }
+}
+</script>
